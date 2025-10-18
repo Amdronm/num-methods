@@ -75,7 +75,8 @@ $$
 ## Running program
 ```
 mkdir build
-cmake --build build
+cd build
+cmake ..
 ./build/gauss_ldlt <input.txt> <output.txt>
 ```
 Where input.txt and output.txt are optional filenames for data
