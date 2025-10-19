@@ -1,3 +1,4 @@
+#include <cmath>
 #include <cstddef>
 #include <cstring>
 #include <fstream>
@@ -73,18 +74,18 @@ std::ostream& operator<<(std::ostream& out, const std::vector<T>& other) {
 }
 
 double FindMaxNorm(const Matrix& mat) {
-    double res = std::abs(mat[0, 0]);
+    double res = 0.;
     for (size_t i = 0; i < mat.Rows(); ++i) {
+        double norm = 0.;
         for (size_t j = 0; j < mat.Columns(); ++j) {
-            res = std::max(res, std::abs(mat[i, j]));
+            norm += std::fabs(mat[i, j]);
         }
+        res = std::max(norm, res);
     }
     return res;
 }
 
 void SolveFast(std::istream& in, std::ostream& out);
-
-void SolveSlow(std::istream& in, std::ostream& out);
 
 int main(int argc, char* argv[]) {
     std::ios_base::sync_with_stdio(false);
@@ -113,7 +114,6 @@ int main(int argc, char* argv[]) {
     auto& in = *in_ptr;
     auto& out = *out_ptr;
 
-    // SolveSlow(in, out);
     SolveFast(in, out);
 
     return 0;
@@ -146,53 +146,6 @@ void SolveFast(std::istream& in, std::ostream& out) {
 
     out << "\nReversed Matrix A : \n" << rev_a;
 
-    out << "\nCondition number = " << norm_a * FindMaxNorm(rev_a) << std::endl;
-}
-
-void SolveSlow(std::istream& in, std::ostream& out) {
-    Matrix mat_data = ReadMatrix(in);
-
-    if (mat_data != Transpose(mat_data)) {
-        std::cerr << "Matrix is not symmetric" << std::endl;
-        return;
-    }
-
-    Matrix mat_a = mat_data;
-    out << "Matrix A :\n" << mat_a;
-
-    auto mat_l = mat_a.FindLUDecomp();
-    std::vector<double> diag_d = mat_a.GetDiagonal();
-    Matrix mat_lt = Transpose(mat_l);
-
-    out << "\nAfter Gauss : \n"
-        << "Matrix A :\n"
-        << mat_a << "\nMatrix L : \n"
-        << mat_l << "\nMatrix D = diag :\n"
-        << diag_d << "\nMatrix Lt : \n"
-        << mat_lt;
-
-    std::vector<double> diag_d_rev = diag_d;
-    for (auto& elem : diag_d_rev) {
-        elem = 1. / elem;
-    }
-
-    size_t dim = mat_a.Rows();
-    std::vector<std::vector<double>> rev_a(dim);
-    for (size_t i = 0; i < dim; ++i) {
-        std::vector<double> vec_e(dim, 0);
-        vec_e[i] = 1;
-        auto res = SolveBotTriangle(mat_l, vec_e);
-        MulVector(&res, diag_d_rev);
-        res = SolveTopTriangle(mat_lt, res);
-        rev_a[i] = res;
-    }
-
-    Matrix mat_a_rev = Matrix(rev_a);
-
-    out << "\nReversed A : \n" << mat_a_rev;
-
-    out << "\nCondition number = \n"
-        << FindMaxNorm(mat_data) * FindMaxNorm(mat_a_rev);
-    std::ifstream fin("input_rand.txt");
-    std::ofstream fout("output.txt");
+    out << "\nCondition number = " << std::setprecision(20)
+        << norm_a * FindMaxNorm(rev_a) << std::endl;
 }

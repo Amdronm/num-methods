@@ -50,38 +50,6 @@ public:
 
     std::vector<double>& operator[](size_t row) { return data_[row]; }
 
-    Matrix operator-() const {
-        Matrix mat = *this;
-        for (size_t i = 0; i < mat.Rows(); ++i) {
-            for (size_t j = 0; j < mat.Columns(); ++j) {
-                mat[i, j] = -mat[i, j];
-            }
-        }
-        return mat;
-    }
-
-    Matrix& operator+=(const Matrix& other) {
-        for (size_t i = 0; i < this->Rows(); ++i) {
-            for (size_t j = 0; j < this->Columns(); ++j) {
-                (*this)[i, j] += other[i, j];
-            }
-        }
-        return *this;
-    }
-
-    Matrix operator+(const Matrix& other) const {
-        Matrix mat = *this;
-        mat += other;
-        return mat;
-    }
-
-    Matrix& operator-=(const Matrix& other) {
-        *this += -other;
-        return *this;
-    }
-
-    Matrix operator-(const Matrix& other) const { return *this + (-other); }
-
     Matrix operator*(const Matrix& other) const {
         Matrix res = Matrix(this->Rows(), other.Columns());
         for (size_t i = 0; i < res.Rows(); ++i) {
