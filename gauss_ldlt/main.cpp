@@ -29,6 +29,7 @@ Matrix ReadMatrix(std::istream& fin) {
     return mat_a;
 }
 
+// solves mat*x=vec system with bot triangle mat
 std::vector<double> SolveBotTriangle(const Matrix& mat,
                                      const std::vector<double>& vec) {
     std::vector<double> sol;
@@ -44,6 +45,7 @@ std::vector<double> SolveBotTriangle(const Matrix& mat,
     return sol;
 }
 
+// solves mat*x=vec system with top triangle mat
 std::vector<double> SolveTopTriangle(const Matrix& mat,
                                      const std::vector<double>& vec) {
     std::vector<double> sol(vec.size());
@@ -58,9 +60,9 @@ std::vector<double> SolveTopTriangle(const Matrix& mat,
     return sol;
 }
 
-void MulVector(std::vector<double>* vec1, const std::vector<double>& vec_by) {
-    for (size_t i = 0; i < vec1->size(); ++i) {
-        (*vec1)[i] *= vec_by[i];
+void MulVector(std::vector<double>& vec, const std::vector<double>& vec_by) {
+    for (size_t i = 0; i < vec.size(); ++i) {
+        vec[i] *= vec_by[i];
     }
 }
 
@@ -73,6 +75,7 @@ std::ostream& operator<<(std::ostream& out, const std::vector<T>& other) {
     return out;
 }
 
+// returns matrix maximum norm
 double FindMaxNorm(const Matrix& mat) {
     double res = 0.;
     for (size_t i = 0; i < mat.Rows(); ++i) {
@@ -139,13 +142,14 @@ void SolveFast(std::istream& in, std::ostream& out) {
         std::vector<double> vec_e(dim, 0.);
         vec_e[i] = 1.;
         auto res = SolveBotTriangle(mat_l, vec_e);
-        MulVector(&res, diag_d_rev);
+        MulVector(res, diag_d_rev);
         res = SolveTopTriangle(mat_lt, res);
         rev_a[i] = res;
     }
 
     out << "\nReversed Matrix A : \n" << rev_a;
 
-    out << "\nCondition number = " << std::setprecision(20)
+    out << "\nCondition number = "
+        // << std::setprecision(15)
         << norm_a * FindMaxNorm(rev_a) << std::endl;
 }

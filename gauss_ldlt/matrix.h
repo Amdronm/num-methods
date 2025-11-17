@@ -94,6 +94,7 @@ public:
         }
     }
 
+    // throws if det(M) == 0
     double FindMaxElemInColumn(size_t row, size_t col) {
         size_t idx = row;
         for (size_t i = row; i < this->Rows(); ++i) {
@@ -108,6 +109,7 @@ public:
         return data_[row][col];
     }
 
+    // returns L matrix, making U from given matrix
     Matrix FindLUDecomp() {
         Matrix res = Identity(this->Rows());
         for (size_t j = 0; j < this->Columns(); ++j) {
