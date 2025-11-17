@@ -69,7 +69,7 @@ https://github.com/Amdronm/num-methods/tree/main/gauss_ldlt
 
 
 2) В третьем задании число обусловленности по матричной максимум норме (максимальная сумма модулей элементов строки)
-   получилась равной $69721112136.237548828 \quad = (6.9721112136 \cdot 10^{10})$, что сильно отличается от данного даже порядком
+   получилась равной $69721112136.237548828 \quad = (6.9721112136 \cdot 10^{10})$, что сильно отличается от данного даже порядком. Точных цифр получается только 15, т. к. тип `double` в С++ имеет именно такую точность.
     
 
 3) За минуту получилось обратить матрицу размерности 3400
@@ -190,6 +190,7 @@ public:
         }
     }
 
+    // throws if det(M) == 0
     double FindMaxElemInColumn(size_t row, size_t col) {
         size_t idx = row;
         for (size_t i = row; i < this->Rows(); ++i) {
@@ -204,6 +205,7 @@ public:
         return data_[row][col];
     }
 
+    // returns L matrix, making U from given matrix
     Matrix FindLUDecomp() {
         Matrix res = Identity(this->Rows());
         for (size_t j = 0; j < this->Columns(); ++j) {
@@ -241,6 +243,7 @@ Matrix Identity(size_t dim) {
     }
     return res;
 }
+
 ```
 
 `main.cpp`
@@ -277,6 +280,7 @@ Matrix ReadMatrix(std::istream& fin) {
     return mat_a;
 }
 
+// solves mat*x=vec system with bot triangle mat
 std::vector<double> SolveBotTriangle(const Matrix& mat,
                                      const std::vector<double>& vec) {
     std::vector<double> sol;
@@ -292,6 +296,7 @@ std::vector<double> SolveBotTriangle(const Matrix& mat,
     return sol;
 }
 
+// solves mat*x=vec system with top triangle mat
 std::vector<double> SolveTopTriangle(const Matrix& mat,
                                      const std::vector<double>& vec) {
     std::vector<double> sol(vec.size());
@@ -306,9 +311,9 @@ std::vector<double> SolveTopTriangle(const Matrix& mat,
     return sol;
 }
 
-void MulVector(std::vector<double>* vec1, const std::vector<double>& vec_by) {
-    for (size_t i = 0; i < vec1->size(); ++i) {
-        (*vec1)[i] *= vec_by[i];
+void MulVector(std::vector<double>& vec, const std::vector<double>& vec_by) {
+    for (size_t i = 0; i < vec.size(); ++i) {
+        vec[i] *= vec_by[i];
     }
 }
 
@@ -321,16 +326,17 @@ std::ostream& operator<<(std::ostream& out, const std::vector<T>& other) {
     return out;
 }
 
+// returns matrix maximum norm
 double FindMaxNorm(const Matrix& mat) {
-    double res = 0.;
+    double y = 0.;
     for (size_t i = 0; i < mat.Rows(); ++i) {
         double norm = 0.;
         for (size_t j = 0; j < mat.Columns(); ++j) {
             norm += std::fabs(mat[i, j]);
         }
-        res = std::max(norm, res);
+        y = std::max(norm, y);
     }
-    return res;
+    return y;
 }
 
 void SolveFast(std::istream& in, std::ostream& out);
@@ -380,21 +386,30 @@ void SolveFast(std::istream& in, std::ostream& out) {
         elem = 1. / elem;
     }
 
+    /// here we find A^-1 solving
+    /// n eqations Ax=e_i i = 1,2,...,n
+    /// where e_i = (0, 0, ..., 1, ... 0) 1 in i position
+    /// first Ly_i=e_i
+    /// y *= D^-1
+    /// L^t*x_i=y_i
+    /// x_i is i column of A^-1
+    /// thus we solved A*A^-1=E column by column
     size_t dim = diag_d.size();
     Matrix rev_a(dim);
     auto mat_lt = Transpose(mat_l);
     for (size_t i = 0; i < dim; ++i) {
         std::vector<double> vec_e(dim, 0.);
         vec_e[i] = 1.;
-        auto res = SolveBotTriangle(mat_l, vec_e);
-        MulVector(&res, diag_d_rev);
-        res = SolveTopTriangle(mat_lt, res);
-        rev_a[i] = res;
+        auto y = SolveBotTriangle(mat_l, vec_e);
+        MulVector(y, diag_d_rev);
+        y = SolveTopTriangle(mat_lt, y);
+        rev_a[i] = y;
     }
 
     out << "\nReversed Matrix A : \n" << rev_a;
 
-    out << "\nCondition number = " << std::setprecision(20)
+    out << "\nCondition number = "
+        // << std::setprecision(15)
         << norm_a * FindMaxNorm(rev_a) << std::endl;
 }
 ```

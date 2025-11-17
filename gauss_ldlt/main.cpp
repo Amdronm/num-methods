@@ -77,15 +77,15 @@ std::ostream& operator<<(std::ostream& out, const std::vector<T>& other) {
 
 // returns matrix maximum norm
 double FindMaxNorm(const Matrix& mat) {
-    double res = 0.;
+    double y = 0.;
     for (size_t i = 0; i < mat.Rows(); ++i) {
         double norm = 0.;
         for (size_t j = 0; j < mat.Columns(); ++j) {
             norm += std::fabs(mat[i, j]);
         }
-        res = std::max(norm, res);
+        y = std::max(norm, y);
     }
-    return res;
+    return y;
 }
 
 void SolveFast(std::istream& in, std::ostream& out);
@@ -135,16 +135,24 @@ void SolveFast(std::istream& in, std::ostream& out) {
         elem = 1. / elem;
     }
 
+    /// here we find A^-1 solving
+    /// n eqations Ax=e_i i = 1,2,...,n
+    /// where e_i = (0, 0, ..., 1, ... 0) 1 in i position
+    /// first Ly_i=e_i
+    /// y *= D^-1
+    /// L^t*x_i=y_i
+    /// x_i is i column of A^-1
+    /// thus we solved A*A^-1=E column by column
     size_t dim = diag_d.size();
     Matrix rev_a(dim);
     auto mat_lt = Transpose(mat_l);
     for (size_t i = 0; i < dim; ++i) {
         std::vector<double> vec_e(dim, 0.);
         vec_e[i] = 1.;
-        auto res = SolveBotTriangle(mat_l, vec_e);
-        MulVector(res, diag_d_rev);
-        res = SolveTopTriangle(mat_lt, res);
-        rev_a[i] = res;
+        auto y = SolveBotTriangle(mat_l, vec_e);
+        MulVector(y, diag_d_rev);
+        y = SolveTopTriangle(mat_lt, y);
+        rev_a[i] = y;
     }
 
     out << "\nReversed Matrix A : \n" << rev_a;
