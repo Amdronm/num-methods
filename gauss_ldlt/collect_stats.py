@@ -5,12 +5,13 @@ import matplotlib.pyplot as plt
 
 
 def run_benches() -> list[Tuple[int, float]]:
-    sizes: list[int] = [100 + i * 100 for i in range(20)]
+    sizes: list[int] = [100 + i * 300 for i in range(12)]
     result: list[Tuple[int, float]] = []
     for size in sizes:
         write_matrix(create_matrix(size))
         time = run_process()
         result.append((size, time))
+        print(f"{size} rows done in {time}")
 
     return result
 
