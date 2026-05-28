@@ -1,6 +1,7 @@
 #include <array>
 #include <fstream>
 #include <iomanip>
+#include <iostream>
 #include <string>
 #include <vector>
 
@@ -35,11 +36,12 @@ static constexpr double kB = 10.;
 static constexpr Vec kY0 = {2., 1.};
 
 // change
-static constexpr size_t kN = 1e8;
-static constexpr Vec kY1 = {2.0000002,1.};
+static constexpr size_t kN = 1e7;
+static constexpr Vec kY1 = {2.0000020000010, 1.0000000000010};
 
 static constexpr double kH = (kB - kA) / kN;
-std::string kPath = "output" + (kN == 200 ? "" : std::to_string(kN)) + ".csv";
+std::string kPath =
+    "output" + (kN == 200 ? "" : std::to_string(kN) + "l") + ".csv";
 
 // specific task
 constexpr Vec F(Vec y) {
@@ -58,8 +60,8 @@ constexpr Vec Yi(Vec yi_1, Vec fi_1, Vec fi_2) {
 int main() {
     std::ofstream fout(kPath);
 
-    std::vector<std::array<double, kDim>> ys = {kY0, kY1};
-    ys.resize(kN + 1);
+    std::vector<Vec> ys = {kY0, kY1};
+    // ys.resize(kN + 1);
 
     Vec f_prev = F(kY0);
     for (size_t i = 2; i < ys.size(); ++i) {
@@ -76,6 +78,5 @@ int main() {
     // }
     auto [u, v] = ys.back();
     fout << u << "," << v;
-
     return 0;
 }
