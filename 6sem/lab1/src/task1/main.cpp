@@ -20,7 +20,7 @@ double F(double x) { return std::pow(16., -x) + std::log(x) * kRevLog16; }
 double Df(double x) { return -std::pow(16., -x) * kLog16 + 1. / x * kRevLog16; }
 
 const std::vector<std::pair<double, double>> kIntervals = {
-    {.15, .3}, {.3, .45}, {.45, .6}};
+    {.2182736, .3}, {.3, .45}, {.45, .54789798}};
 
 template <typename T>
 void MyPrint(const std::vector<T>& vec, std::ostream& out = std::cerr) {
@@ -38,7 +38,7 @@ double BisectionMethod(double a, double b, std::vector<double>& pts) {
 
     size_t cnt{};
     while (std::abs(fx) > kEps) {
-        x = (a + b) / 2;
+        x = (a + b) / 2.;
         fx = F(x);
 
         pts.push_back(std::abs(fx));

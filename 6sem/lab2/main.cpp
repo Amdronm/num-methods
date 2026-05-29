@@ -1,3 +1,5 @@
+#include <algorithm>
+#include <iostream>
 #include <vector>
 
 const std::vector<double> kX = {
@@ -62,4 +64,9 @@ const std::vector<double> kY = {
     -10.726,  -14.9171,  -3.16074,  1.02401,   -16.037,   -16.4758,  -8.61416,
     0.133601, -10.6217,  1.60836,   -0.155225};
 
-int main() { return 0; }
+int main() {
+    auto minmax = std::minmax_element(kX.begin(), kX.end());
+    std::cerr << "N = " << kX.size() << ", a = " << *minmax.first
+              << ", b = " << *minmax.second << "\n";
+    return 0;
+}

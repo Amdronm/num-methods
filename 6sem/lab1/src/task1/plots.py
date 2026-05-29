@@ -19,16 +19,28 @@ def read_results(filename):
 def main():
     res_b = read_results("outputB.txt")
     res_n = read_results("outputN.txt")
-    intervals = ["[0.15, 0.3]", "[0.3, 0.45]", "[0.45, 0.6]"]
+    intervals = ["[0.2182736, 0.3]", "[0.3, 0.45]", "[0.45, 0.54789798]"]
 
     for i in range(3):
         plt.figure(figsize=(6, 4.5))
 
         if i < len(res_b) and res_b[i]:
-            plt.plot(range(1, len(res_b[i]) + 1), res_b[i], "o-", color="navy", label="Бисекция")
+            plt.plot(
+                range(1, len(res_b[i]) + 1),
+                res_b[i],
+                "o-",
+                color="navy",
+                label="Бисекция",
+            )
 
         if i < len(res_n) and res_n[i]:
-            plt.plot(range(1, len(res_n[i]) + 1), res_n[i], "s-", color="crimson", label="Ньютон")
+            plt.plot(
+                range(1, len(res_n[i]) + 1),
+                res_n[i],
+                "s-",
+                color="crimson",
+                label="Ньютон",
+            )
 
         plt.yscale("log")
         plt.xlabel("Номер итерации k")
